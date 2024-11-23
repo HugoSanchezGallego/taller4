@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Taller4</string>
+    <string name="diary_activity_label">Diary Activity</string>
+    <!-- Add other string resources here -->
+</resources>
