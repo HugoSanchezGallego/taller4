@@ -70,8 +70,8 @@ class DiaryActivity : AppCompatActivity(), SensorEventListener {
 
             if (acceleration > 12 && currentTime - lastShakeTime > 1000) {
                 lastShakeTime = currentTime
-                changeBackgroundColor()
-                Toast.makeText(this, "¡Sacudiste para un nuevo color de ánimo!", Toast.LENGTH_SHORT).show()
+                changeBackgroundColorToRed()
+                Toast.makeText(this, "¡Sacudiste el móvil!", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -80,15 +80,8 @@ class DiaryActivity : AppCompatActivity(), SensorEventListener {
         // No se necesita implementar
     }
 
-    private fun changeBackgroundColor() {
-        val colors = listOf(
-            android.R.color.holo_red_light,
-            android.R.color.holo_green_light,
-            android.R.color.holo_blue_light,
-            android.R.color.holo_orange_light
-        )
-        val randomColor = colors.random()
-        findViewById<View>(R.id.detailFragmentContainer).setBackgroundResource(randomColor)
+    private fun changeBackgroundColorToRed() {
+        findViewById<View>(R.id.detailFragmentContainer).setBackgroundResource(android.R.color.holo_red_light)
     }
 
     fun showDiaryDetail(entryId: Int) {
@@ -103,14 +96,24 @@ class DiaryActivity : AppCompatActivity(), SensorEventListener {
 
     fun addDiaryEntry(entry: DiaryEntry) {
         diaryEntries.add(entry)
+        saveDiaryEntries()
         val listFragment = supportFragmentManager.findFragmentById(R.id.listFragmentContainer) as? DiaryListFragment
         listFragment?.updateAdapter(diaryEntries)
     }
 
     fun deleteDiaryEntry(entryId: Int) {
         diaryEntries.removeAt(entryId)
+        saveDiaryEntries()
         val listFragment = supportFragmentManager.findFragmentById(R.id.listFragmentContainer) as? DiaryListFragment
         listFragment?.updateAdapter(diaryEntries)
         showDiaryDetail(0) // Show the first entry or a default view
+    }
+
+    private fun saveDiaryEntries() {
+        val sharedPreferences = getSharedPreferences("diary_entries", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val entries = diaryEntries.map { "${it.title} - ${it.date}" }.toSet()
+        editor.putStringSet("entries", entries)
+        editor.apply()
     }
 }
